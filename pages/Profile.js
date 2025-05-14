@@ -1,18 +1,60 @@
-
-import { useState } from "react"
-import { StyleSheet, View, Text, Image, TouchableOpacity, Switch, ScrollView } from "react-native"
-import { LinearGradient } from "expo-linear-gradient"
+import { useEffect, useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Switch,
+  ScrollView,
+} from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ProfilePage() {
-  const [darkMode, setDarkMode] = useState(false)
-  const [notifications, setNotifications] = useState(true)
+  const [darkMode, setDarkMode] = useState(false);
+  const [notifications, setNotifications] = useState(true);
+  const navigation = useNavigation();
+  useEffect(() => {
+    // בעת טעינת העמוד – טוען ערכים שנשמרו
+    const loadSettings = async () => {
+      try {
+        const savedDarkMode = await AsyncStorage.getItem("darkMode");
+        const savedNotifications = await AsyncStorage.getItem("notifications");
+
+        if (savedDarkMode !== null) setDarkMode(savedDarkMode === "true");
+        if (savedNotifications !== null)
+          setNotifications(savedNotifications === "true");
+      } catch (error) {
+        console.error("  error in fetching storage data", error);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  useEffect(() => {
+    // שומר כל פעם שמשנים את הערכים
+    AsyncStorage.setItem("darkMode", darkMode.toString());
+  }, [darkMode]);
+
+  useEffect(() => {
+    AsyncStorage.setItem("notifications", notifications.toString());
+  }, [notifications]);
 
   return (
     <View style={styles.container}>
-      <LinearGradient colors={["#6a11cb", "#2575fc"]} style={styles.profileHeader}>
-        <Image source={{ uri: "/placeholder.svg?height=100&width=100" }} style={styles.profileImage} />
-        <Text style={styles.profileName}>John Doe</Text>
-        <Text style={styles.profileUsername}>@johndoe</Text>
+      <LinearGradient
+        colors={["#6a11cb", "#2575fc"]}
+        style={styles.profileHeader}
+      >
+        <Image
+          source={require("../images/icon.jpg")}
+          style={styles.profileImage}
+        />
+        <Text style={styles.profileName}>Mali Elkayam</Text>
+        <Text style={styles.profileUsername}>m@gmail.com</Text>
         <View style={styles.statsContainer}>
           <View style={styles.statItem}>
             <Text style={styles.statNumber}>42</Text>
@@ -33,8 +75,8 @@ export default function ProfilePage() {
         <View style={styles.bioSection}>
           <Text style={styles.sectionTitle}>Bio</Text>
           <Text style={styles.bioText}>
-            Full-stack developer passionate about React Native and open source projects. Working on innovative mobile
-            solutions.
+            Full-stack developer passionate about React Native and open source
+            projects. Working on innovative mobile solutions.
           </Text>
         </View>
 
@@ -62,12 +104,15 @@ export default function ProfilePage() {
           </View>
         </View>
 
-        <TouchableOpacity style={styles.logoutButton}>
-          <Text style={styles.logoutButtonText}>Logout</Text>
+        <TouchableOpacity
+          style={styles.passPage}
+          onPress={() => navigation.navigate("Details")}
+        >
+          <Text style={styles.passPageText}>To My GitHub Repositoris</Text>
         </TouchableOpacity>
       </ScrollView>
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
@@ -151,17 +196,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-  logoutButton: {
-    backgroundColor: "#ff3b30",
+  passPage: {
+    backgroundColor: "#2575fc",
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 16,
     marginBottom: 32,
   },
-  logoutButtonText: {
+  passPageText: {
     color: "#ffffff",
     fontSize: 16,
     fontWeight: "bold",
   },
-})
+});

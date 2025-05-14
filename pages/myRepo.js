@@ -1,6 +1,4 @@
-"use client"
-
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -18,84 +16,93 @@ import {
   Platform,
   ScrollView,
   ImageBackground,
-} from "react-native"
-import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context"
-import axios from "axios"
-import { Search, Filter, X, ExternalLink, Star, GitFork } from "lucide-react-native"
+} from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import { Feather, FontAwesome } from "@expo/vector-icons";
 
-export default function RepositoriesScreen() {
-  const [repos, setRepos] = useState([])
-  const [filteredRepos, setFilteredRepos] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedRepo, setSelectedRepo] = useState(null)
-  const [modalVisible, setModalVisible] = useState(false)
-  const [isDarkMode, setIsDarkMode] = useState(false)
-  const [showLanguageFilter, setShowLanguageFilter] = useState(false)
-  const scrollViewRef = useRef(null)
+export default function MyRepo() {
+  const [repos, setRepos] = useState([]);
+  const [filteredRepos, setFilteredRepos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedRepo, setSelectedRepo] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [showLanguageFilter, setShowLanguageFilter] = useState(false);
+  const scrollViewRef = useRef(null);
 
   // Fetch repositories
   useEffect(() => {
-    fetchRepositories()
-  }, [])
+    fetchRepositories();
+  }, []);
 
   // Filter repositories when search query changes
   useEffect(() => {
     if (searchQuery.trim() === "") {
-      setFilteredRepos(repos)
+      setFilteredRepos(repos);
     } else {
       const filtered = repos.filter(
         (repo) =>
           repo.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          (repo.description && repo.description.toLowerCase().includes(searchQuery.toLowerCase())),
-      )
-      setFilteredRepos(filtered)
+          (repo.description &&
+            repo.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
+      setFilteredRepos(filtered);
     }
-  }, [searchQuery, repos])
+  }, [searchQuery, repos]);
 
   const fetchRepositories = () => {
-    setLoading(true)
+    setLoading(true);
     axios
       .get("http://10.0.2.2:5072/GitHub")
       .then((res) => {
-        setRepos(res.data)
-        setFilteredRepos(res.data)
+        setRepos(res.data);
+        setFilteredRepos(res.data);
       })
       .catch((err) => {
-        console.error("Error loading repositories:", err)
-        Alert.alert("Error", "Failed to load repositories. Please try again later.", [{ text: "OK" }])
+        console.error("Error loading repositories:", err);
+        Alert.alert(
+          "Error",
+          "Failed to load repositories. Please try again later.",
+          [{ text: "OK" }]
+        );
       })
-      .finally(() => setLoading(false))
-  }
+      .finally(() => setLoading(false));
+  };
 
   const handleRepoPress = (repo) => {
-    setSelectedRepo(repo)
-    setModalVisible(true)
-  }
+    setSelectedRepo(repo);
+    setModalVisible(true);
+  };
 
   const sortByStars = () => {
-    const sorted = [...filteredRepos].sort((a, b) => b.stargazersCount - a.stargazersCount)
-    setFilteredRepos(sorted)
-    Alert.alert("Sorted", "Repositories sorted by stars")
-  }
+    const sorted = [...filteredRepos].sort(
+      (a, b) => b.stargazersCount - a.stargazersCount
+    );
+    setFilteredRepos(sorted);
+    Alert.alert("Sorted", "Repositories sorted by stars");
+  };
 
   const filterByLanguage = (language) => {
     if (!language) {
-      setFilteredRepos(repos)
+      setFilteredRepos(repos);
     } else {
-      const filtered = repos.filter((repo) => repo.language === language)
-      setFilteredRepos(filtered)
+      const filtered = repos.filter((repo) => repo.language === language);
+      setFilteredRepos(filtered);
     }
-    setShowLanguageFilter(false)
-  }
+    setShowLanguageFilter(false);
+  };
 
   const getUniqueLanguages = () => {
-    const languages = repos.map((repo) => repo.language).filter((language) => language !== null)
-    return [...new Set(languages)]
-  }
+    const languages = repos
+      .map((repo) => repo.language)
+      .filter((language) => language !== null);
+    return [...new Set(languages)];
+  };
 
   const renderLanguageFilter = () => {
-    const languages = getUniqueLanguages()
+    const languages = getUniqueLanguages();
     return (
       <Modal
         animationType="slide"
@@ -104,31 +111,69 @@ export default function RepositoriesScreen() {
         onRequestClose={() => setShowLanguageFilter(false)}
       >
         <View style={styles.languageFilterContainer}>
-          <View style={[styles.languageFilterContent, isDarkMode && styles.darkModeBackground]}>
+          <View
+            style={[
+              styles.languageFilterContent,
+              isDarkMode && styles.darkModeBackground,
+            ]}
+          >
             <View style={styles.languageFilterHeader}>
-              <Text style={[styles.languageFilterTitle, isDarkMode && styles.darkModeText]}>Filter by Language</Text>
+              <Text
+                style={[
+                  styles.languageFilterTitle,
+                  isDarkMode && styles.darkModeText,
+                ]}
+              >
+                Filter by Language
+              </Text>
               <TouchableOpacity onPress={() => setShowLanguageFilter(false)}>
-                <X size={24} color={isDarkMode ? "#fff" : "#000"} />
+                <Feather
+                  name="x"
+                  size={22}
+                  color="red"
+                  style={{ marginRight: 4 }}
+                />
               </TouchableOpacity>
             </View>
             <ScrollView>
-              <TouchableOpacity style={styles.languageItem} onPress={() => filterByLanguage(null)}>
-                <Text style={[styles.languageText, isDarkMode && styles.darkModeText]}>All Languages</Text>
+              <TouchableOpacity
+                style={styles.languageItem}
+                onPress={() => filterByLanguage(null)}
+              >
+                <Text
+                  style={[
+                    styles.languageText,
+                    isDarkMode && styles.darkModeText,
+                  ]}
+                >
+                  All Languages
+                </Text>
               </TouchableOpacity>
               {languages.map((language) => (
-                <TouchableOpacity key={language} style={styles.languageItem} onPress={() => filterByLanguage(language)}>
-                  <Text style={[styles.languageText, isDarkMode && styles.darkModeText]}>{language}</Text>
+                <TouchableOpacity
+                  key={language}
+                  style={styles.languageItem}
+                  onPress={() => filterByLanguage(language)}
+                >
+                  <Text
+                    style={[
+                      styles.languageText,
+                      isDarkMode && styles.darkModeText,
+                    ]}
+                  >
+                    {language}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </ScrollView>
           </View>
         </View>
       </Modal>
-    )
-  }
+    );
+  };
 
   const renderRepoModal = () => {
-    if (!selectedRepo) return null
+    if (!selectedRepo) return null;
 
     return (
       <Modal
@@ -138,49 +183,115 @@ export default function RepositoriesScreen() {
         onRequestClose={() => setModalVisible(false)}
       >
         <View style={styles.modalContainer}>
-          <View style={[styles.modalContent, isDarkMode && styles.darkModeBackground]}>
+          <View
+            style={[
+              styles.modalContent,
+              isDarkMode && styles.darkModeBackground,
+            ]}
+          >
             <ScrollView>
               <View style={styles.modalHeader}>
                 <View style={styles.modalTitleContainer}>
-                  <Image source={{ uri: selectedRepo.owner?.avatarUrl }} style={styles.modalAvatar} />
-                  <Text style={[styles.modalTitle, isDarkMode && styles.darkModeText]}>{selectedRepo.name}</Text>
+                  <Image
+                    source={{ uri: selectedRepo.owner?.avatarUrl }}
+                    style={styles.modalAvatar}
+                  />
+                  <Text
+                    style={[
+                      styles.modalTitle,
+                      isDarkMode && styles.darkModeText,
+                    ]}
+                  >
+                    {selectedRepo.name}
+                  </Text>
                 </View>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
-                  <X size={24} color={isDarkMode ? "#fff" : "#000"} />
+                  <Feather
+                    name="x"
+                    size={22}
+                    color="red"
+                    a
+                    style={{ marginRight: 4 }}
+                  />
                 </TouchableOpacity>
               </View>
 
               <View style={styles.modalInfoContainer}>
-                <Text style={[styles.modalInfoLabel, isDarkMode && styles.darkModeText]}>Owner:</Text>
-                <Text style={[styles.modalInfoValue, isDarkMode && styles.darkModeText]}>
+                <Text
+                  style={[
+                    styles.modalInfoLabel,
+                    isDarkMode && styles.darkModeText,
+                  ]}
+                >
+                  Owner:
+                </Text>
+                <Text
+                  style={[
+                    styles.modalInfoValue,
+                    isDarkMode && styles.darkModeText,
+                  ]}
+                >
                   {selectedRepo.owner?.login}
                 </Text>
               </View>
 
               <View style={styles.modalInfoContainer}>
-                <Text style={[styles.modalInfoLabel, isDarkMode && styles.darkModeText]}>Language:</Text>
-                <Text style={[styles.modalInfoValue, isDarkMode && styles.darkModeText]}>
+                <Text
+                  style={[
+                    styles.modalInfoLabel,
+                    isDarkMode && styles.darkModeText,
+                  ]}
+                >
+                  Language:
+                </Text>
+                <Text
+                  style={[
+                    styles.modalInfoValue,
+                    isDarkMode && styles.darkModeText,
+                  ]}
+                >
                   {selectedRepo.language || "Not specified"}
                 </Text>
               </View>
 
               <View style={styles.modalInfoContainer}>
-                <Text style={[styles.modalInfoLabel, isDarkMode && styles.darkModeText]}>Description:</Text>
-                <Text style={[styles.modalInfoValue, isDarkMode && styles.darkModeText]}>
+                <Text
+                  style={[
+                    styles.modalInfoLabel,
+                    isDarkMode && styles.darkModeText,
+                  ]}
+                >
+                  Description:
+                </Text>
+                <Text
+                  style={[
+                    styles.modalInfoValue,
+                    isDarkMode && styles.darkModeText,
+                  ]}
+                >
                   {selectedRepo.description || "No description available"}
                 </Text>
               </View>
 
               <View style={styles.statsContainer}>
                 <View style={styles.statItem}>
-                  <Star size={16} color={isDarkMode ? "#fff" : "#000"} />
-                  <Text style={[styles.statText, isDarkMode && styles.darkModeText]}>
+                  <Feather
+                    name="star"
+                    size={16}
+                    color="gold"
+                    style={{ marginRight: 4 }}
+                  />
+                  <Text
+                    style={[styles.statText, isDarkMode && styles.darkModeText]}
+                  >
                     {selectedRepo.stargazersCount || 0}
                   </Text>
                 </View>
                 <View style={styles.statItem}>
-                  <GitFork size={16} color={isDarkMode ? "#fff" : "#000"} />
-                  <Text style={[styles.statText, isDarkMode && styles.darkModeText]}>
+                  <FontAwesome name="code-fork" size={16} color="gold" />
+                  <Text
+                    style={[styles.statText, isDarkMode && styles.darkModeText]}
+                  >
                     {selectedRepo.forksCount || 0}
                   </Text>
                 </View>
@@ -189,31 +300,53 @@ export default function RepositoriesScreen() {
               <TouchableOpacity
                 style={styles.openButton}
                 onPress={() => {
-                  Alert.alert("Open Repository", `Would open ${selectedRepo.htmlUrl} in browser`)
+                  Alert.alert(
+                    "Open Repository",
+                    `Would open ${selectedRepo.htmlUrl} in browser`
+                  );
                 }}
               >
                 <Text style={styles.openButtonText}>Open in Browser</Text>
-                <ExternalLink size={16} color="#fff" />
+                <Feather
+                  name="external-link"
+                  size={16}
+                  color="gold"
+                  style={{ marginRight: 4 }}
+                />
               </TouchableOpacity>
             </ScrollView>
           </View>
         </View>
       </Modal>
-    )
-  }
+    );
+  };
 
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => handleRepoPress(item)}>
       <View style={[styles.card, isDarkMode && styles.darkModeCard]}>
         <View style={styles.header}>
-          <Image source={{ uri: item.owner?.avatarUrl }} style={styles.avatar} />
+          <Image
+            source={{ uri: item.owner?.avatarUrl }}
+            style={styles.avatar}
+          />
           <View style={{ marginLeft: 10, flex: 1 }}>
-            <Text style={[styles.name, isDarkMode && styles.darkModeText]}>{item.name}</Text>
-            <Text style={[styles.language, isDarkMode && styles.darkModeText]}>{item.language || "No language"}</Text>
+            <Text style={[styles.name, isDarkMode && styles.darkModeText]}>
+              {item.name}
+            </Text>
+            <Text style={[styles.language, isDarkMode && styles.darkModeText]}>
+              {item.language || "No language"}
+            </Text>
           </View>
           <View style={styles.statItem}>
-            <Star size={16} color={isDarkMode ? "#fff" : "#666"} />
-            <Text style={[styles.statText, isDarkMode && styles.darkModeText]}>{item.stargazersCount || 0}</Text>
+            <Feather
+              name="star"
+              size={16}
+              color="gold"
+              style={{ marginRight: 4 }}
+            />
+            <Text style={[styles.statText, isDarkMode && styles.darkModeText]}>
+              {item.stargazersCount || 0}
+            </Text>
           </View>
         </View>
         <Text style={[styles.description, isDarkMode && styles.darkModeText]}>
@@ -221,29 +354,40 @@ export default function RepositoriesScreen() {
         </Text>
       </View>
     </TouchableOpacity>
-  )
+  );
 
   const renderEmptyList = () => (
     <View style={styles.emptyContainer}>
-      <Text style={[styles.emptyText, isDarkMode && styles.darkModeText]}>No repositories found</Text>
+      <Text style={[styles.emptyText, isDarkMode && styles.darkModeText]}>
+        No repositories found
+      </Text>
       <Pressable style={styles.refreshButton} onPress={fetchRepositories}>
         <Text style={styles.refreshButtonText}>Refresh</Text>
       </Pressable>
     </View>
-  )
+  );
 
   return (
     <SafeAreaProvider>
       <ImageBackground
-        source={{ uri: "/placeholder.svg?height=1&width=1" }}
-        style={{ flex: 1 }}
-        imageStyle={{ opacity: 0.05 }}
+        source={require("../images/bg.png")}
+        style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        imageStyle={{ opacity: 1 }}
       >
-        <SafeAreaView style={[styles.container, isDarkMode && styles.darkModeContainer]}>
+        <SafeAreaView
+          style={[styles.container, isDarkMode && styles.darkModeContainer]}
+        >
           <View style={styles.headerContainer}>
-            <Text style={[styles.title, isDarkMode && styles.darkModeText]}>GitHub Repositories</Text>
+            <Text style={[styles.title, isDarkMode && styles.darkModeText]}>
+              GitHub Repositories
+            </Text>
             <View style={styles.themeToggle}>
-              <Text style={[styles.themeToggleText, isDarkMode && styles.darkModeText]}>
+              <Text
+                style={[
+                  styles.themeToggleText,
+                  isDarkMode && styles.darkModeText,
+                ]}
+              >
                 {isDarkMode ? "Dark" : "Light"}
               </Text>
               <Switch
@@ -255,12 +399,28 @@ export default function RepositoriesScreen() {
             </View>
           </View>
 
-          <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1 }}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            style={{ flex: 1 }}
+          >
             <View style={styles.searchContainer}>
-              <View style={[styles.searchInputContainer, isDarkMode && styles.darkModeInput]}>
-                <Search size={20} color={isDarkMode ? "#fff" : "#666"} />
+              <View
+                style={[
+                  styles.searchInputContainer,
+                  isDarkMode && styles.darkModeInput,
+                ]}
+              >
+                <Feather
+                  name="search"
+                  size={16}
+                  color="gold"
+                  style={{ marginRight: 4 }}
+                />
                 <TextInput
-                  style={[styles.searchInput, isDarkMode && styles.darkModeText]}
+                  style={[
+                    styles.searchInput,
+                    isDarkMode && styles.darkModeText,
+                  ]}
                   placeholder="Search repositories..."
                   placeholderTextColor={isDarkMode ? "#aaa" : "#999"}
                   value={searchQuery}
@@ -271,23 +431,57 @@ export default function RepositoriesScreen() {
 
             <View style={styles.filterContainer}>
               <TouchableOpacity
-                style={[styles.filterButton, isDarkMode && styles.darkModeButton]}
+                style={[
+                  styles.filterButton,
+                  isDarkMode && styles.darkModeButton,
+                ]}
                 onPress={() => setShowLanguageFilter(true)}
               >
-                <Filter size={16} color={isDarkMode ? "#fff" : "#000"} />
-                <Text style={[styles.filterButtonText, isDarkMode && styles.darkModeButtonText]}>Filter</Text>
+                <Feather
+                  name="filter"
+                  size={16}
+                  color="gold"
+                  style={{ marginRight: 4 }}
+                />
+                <Text
+                  style={[
+                    styles.filterButtonText,
+                    isDarkMode && styles.darkModeButtonText,
+                  ]}
+                >
+                  Filter
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.filterButton, isDarkMode && styles.darkModeButton]}
+                style={[
+                  styles.filterButton,
+                  isDarkMode && styles.darkModeButton,
+                ]}
                 onPress={sortByStars}
               >
-                <Star size={16} color={isDarkMode ? "#fff" : "#000"} />
-                <Text style={[styles.filterButtonText, isDarkMode && styles.darkModeButtonText]}>Sort by Stars</Text>
+                <Feather
+                  name="star"
+                  size={16}
+                  color="gold"
+                  style={{ marginRight: 4 }}
+                />
+                <Text
+                  style={[
+                    styles.filterButtonText,
+                    isDarkMode && styles.darkModeButtonText,
+                  ]}
+                >
+                  Sort by Stars
+                </Text>
               </TouchableOpacity>
             </View>
 
             {loading ? (
-              <ActivityIndicator size="large" color={isDarkMode ? "#81b0ff" : "#e93345"} style={styles.loader} />
+              <ActivityIndicator
+                size="large"
+                color={isDarkMode ? "#81b0ff" : "#e93345"}
+                style={styles.loader}
+              />
             ) : (
               <FlatList
                 data={filteredRepos}
@@ -306,13 +500,12 @@ export default function RepositoriesScreen() {
         </SafeAreaView>
       </ImageBackground>
     </SafeAreaProvider>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f1f1f1",
   },
   darkModeContainer: {
     backgroundColor: "#121212",
@@ -360,6 +553,7 @@ const styles = StyleSheet.create({
   searchContainer: {
     paddingHorizontal: 16,
     marginVertical: 12,
+    margin: 5,
   },
   searchInputContainer: {
     flexDirection: "row",
@@ -580,4 +774,4 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#333",
   },
-})
+});
