@@ -55,7 +55,7 @@ export default function MyRepo() {
   const fetchRepositories = () => {
     setLoading(true);
     axios
-      .get("http://10.0.2.2:5072/GitHub")
+      .get("https://cv-site-49za.onrender.com/GitHub")
       .then((res) => {
         setRepos(res.data);
         setFilteredRepos(res.data);
